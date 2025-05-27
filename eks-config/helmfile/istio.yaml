@@ -1,0 +1,32 @@
+releases:
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    version: 1.22.1
+    createNamespace: true
+    wait: true
+    
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    version: 1.22.1
+    wait: true
+    needs:
+      - istio-system/istio-base
+    values:
+      - ../values/istio-values.yaml
+    set:
+      - name: pilot.nodeSelector.node-group
+        value: mgmt
+      - name: pilot.resources.requests.cpu
+        value: 500m
+      - name: pilot.resources.requests.memory
+        value: 2Gi
+      - name: global.proxy.resources.requests.cpu
+        value: 100m
+      - name: global.proxy.resources.requests.memory
+        value: 128Mi
+      - name: global.proxy.resources.limits.cpu
+        value: 200m
+      - name: global.proxy.resources.limits.memory
+        value: 256Mi

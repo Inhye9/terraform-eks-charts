@@ -1,0 +1,28 @@
+clusterName: aim-test-eks-cluster
+region: ap-northeast-2
+vpcId: vpc-00712c7222a396d8e
+
+serviceAccount:
+  create: false
+  name: aws-load-balancer-controller
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector:
+  node-group: mgmt
+
+tolerations:
+  - key: "node-role.kubernetes.io/management"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+podLabels:
+  app: aws-load-balancer-controller
+
+replicaCount: 2

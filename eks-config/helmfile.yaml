@@ -1,0 +1,27 @@
+helmfiles:
+  - path: helmfile/argocd.yaml
+  - path: helmfile/fluentd.yaml
+  - path: helmfile/istio.yaml
+  - path: helmfile/metrics-server.yaml
+  - path: helmfile/aws-lb-controller.yaml
+  - path: helmfile/ingress.yaml
+
+repositories:
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: fluent
+    url: https://fluent.github.io/helm-charts
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+  - name: metrics-server
+    url: https://kubernetes-sigs.github.io/metrics-server/
+  - name: eks
+    url: https://aws.github.io/eks-charts
+
+environments:
+  default:
+    values:
+      - environment: test
+      - clusterName: aim-test-eks-cluster
+      - region: ap-northeast-2
+      - vpcId: vpc-00712c7222a396d8e

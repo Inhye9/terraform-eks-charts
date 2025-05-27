@@ -1,0 +1,20 @@
+releases:
+  - name: aws-load-balancer-controller
+    namespace: kube-system
+    chart: eks/aws-load-balancer-controller
+    version: 1.6.2
+    values:
+      - ../values/lb-controller-values.yaml
+    set:
+      - name: clusterName
+        value: aim-test-eks-cluster
+      - name: region
+        value: ap-northeast-2
+      - name: vpcId
+        value: vpc-00712c7222a396d8e
+      - name: serviceAccount.create
+        value: false
+      - name: serviceAccount.name
+        value: aws-load-balancer-controller
+      - name: nodeSelector.node-group
+        value: mgmt

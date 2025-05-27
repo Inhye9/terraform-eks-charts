@@ -1,0 +1,20 @@
+releases:
+  - name: metrics-server
+    namespace: kube-system
+    chart: metrics-server/metrics-server
+    version: 3.11.0
+    values:
+      - ../values/metrics-values.yaml
+    set:
+      - name: nodeSelector.node-group
+        value: mgmt
+      - name: resources.requests.cpu
+        value: 100m
+      - name: resources.requests.memory
+        value: 200Mi
+      - name: args[0]
+        value: --kubelet-preferred-address-types=InternalIP
+      - name: args[1]
+        value: --kubelet-insecure-tls
+      - name: args[2]
+        value: --metric-resolution=15s
