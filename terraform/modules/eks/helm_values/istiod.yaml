@@ -1,0 +1,14 @@
+pilot:
+  nodeSelector:
+    node-group: mgmt
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+gateways:
+  istio-ingressgateway:
+    enabled: true
+    type: NodePort
+    nodeSelector:
+      node-group: mgmt

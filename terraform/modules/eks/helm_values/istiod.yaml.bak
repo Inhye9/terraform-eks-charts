@@ -1,0 +1,20 @@
+# global:
+#   hub: docker.inner-thehandsome.com/istio
+#   tag: 1.24.2
+#   proxy:
+#     image: proxyv2
+
+pilot:
+  nodeSelector:
+    node-group: mgmt
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+gateways:
+  istio-ingressgateway:
+    enabled: true
+    type: NodePort
+    nodeSelector:
+      node-group: mgmt

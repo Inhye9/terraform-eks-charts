@@ -68,4 +68,84 @@ resource "helm_release" "cluster-autoscaler" {
   depends_on = [module.cluster_autoscaler_pod_identity]
 }
 
+# istio-system namespace 사전 생성 
+resource "kubernetes_namespace" "istio_system" {
+  metadata {
+    name = "istio-system"
+  }
+}
 
+# ★ 기존 istio helm 차트 방식 주석 처리
+# resource "helm_release" "istio_base" {
+#   name       = "istio-base"
+#   namespace  = kubernetes_namespace.istio_system.metadata.0.name
+#   repository = "https://istio-release.storage.googleapis.com/charts"
+#   chart      = "base"
+#   version    = "1.24.2"
+#   timeout    = 10000
+
+#   depends_on = [kubernetes_namespace.istio_system]
+# }
+
+# resource "helm_release" "istiod" {
+#   name       = "istiod"
+#   namespace  = kubernetes_namespace.istio_system.metadata.0.name
+#   repository = "https://istio-release.storage.googleapis.com/charts"
+#   chart      = "istiod"
+#   version    = "1.24.2"
+#   timeout    = 10000
+#   depends_on = [helm_release.istio_base]
+
+#   set {
+#     name  = "pilot.nodeSelector.node-group"
+#     value = "mgmt"
+#   }
+# }
+
+# resource "helm_release" "istio_ingress" {
+#   name       = "istio-ingress"
+#   namespace  = kubernetes_namespace.istio_system.metadata.0.name
+#   repository = "https://istio-release.storage.googleapis.com/charts"
+#   chart      = "gateway"
+#   version    = "1.24.2"
+#   timeout    = 10000
+#   depends_on = [helm_release.istiod]
+
+#   set {
+#     name  = "service.type"
+#     value = "NodePort"
+#   }
+
+#   set {
+#     name  = "nodeSelector.node-group"
+#     value = "mgmt"
+#   }
+# }
+
+# istioctl install과 동일한 설정으로 istiod 설치
+resource "helm_release" "istio" {
+  name       = "istiod"
+  namespace  = kubernetes_namespace.istio_system.metadata.0.name
+  repository = "https://istio-release.storage.googleapis.com/charts"
+  chart      = "istiod"
+  version    = "1.24.2"
+  timeout    = 10000
+  cleanup_on_fail = true
+
+  dynamic "set" {
+    for_each = {
+      "global.proxy.image"                                = "proxyv2"
+      "global.hub"                                        = "docker.inner-thehandsome.com/istio"
+      "gateways.istio-ingressgateway.enabled"             = "true"
+      "gateways.istio-ingressgateway.type"                = "NodePort"
+      "gateways.istio-ingressgateway.nodeSelector.node-group" = "mgmt"
+      "pilot.nodeSelector.node-group"                     = "mgmt"
+    }
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
+
+  depends_on = [kubernetes_namespace.istio_system]
+}
