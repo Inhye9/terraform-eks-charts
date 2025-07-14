@@ -1,3 +1,9 @@
+# global:
+#   hub: <private registry url>/istio
+#   tag: 1.24.2
+#   proxy:
+#     image: proxyv2
+
 pilot:
   nodeSelector:
     node-group: mgmt

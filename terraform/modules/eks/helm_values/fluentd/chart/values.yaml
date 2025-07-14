@@ -1,0 +1,17 @@
+# Default values for db-service
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: fluentd
+replicas: 1
+
+elasticsearch:
+  url: https://your-es-domain:443
+  host: your-es-host
+  port: 443
+
+profiles:
+  active: prd
+
+nodeSelector:
+  key: node-group
+  value: mgmt

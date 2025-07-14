@@ -1,8 +1,8 @@
 # global:
-#   hub: docker.inner-thehandsome.com/istio
-#   tag: 1.24.2
-#   proxy:
-#     image: proxyv2
+#  hub: docker.io/istio
+#  tag: latest
+#  proxy:
+#    image: proxyv2
 
 pilot:
   nodeSelector:

@@ -1,0 +1,23 @@
+controller:
+  replicas: 1
+
+dex:
+  enabled: true
+
+server:
+  replicas: 1
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+  insecure: true
+
+redis:
+  enabled: true
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1

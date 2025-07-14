@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluentd
+  namespace: {{ .Values.namespace }}
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      k8s-app: fluentd-logging
+  template: 
+    metadata:
+      labels:
+        k8s-app: fluentd-logging
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: {{ .Values.nodeSelector.key }}
+                    operator: In
+                    values:
+                      - {{ .Values.nodeSelector.value }}
+      containers:
+      - name: fluentd
+        command: ['sh', '-c', '/config-volume/..data/config-copy.sh']
+        image: fluentd/fluentd:1.0.0
+        env:
+          - name:  FLUENT_ELASTICSEARCH_HOST
+            value: {{ .Values.elasticsearch.host }}
+          - name:  FLUENT_ELASTICSEARCH_PORT
+            value: "{{ .Values.elasticsearch.port }}"           
+          - name: FLUENT_ELASTICSEARCH_SCHEME
+            value: "https"
+          - name: FLUENTD_SYSTEMD_CONF
+            value: "disable"
+          - name: FLUENT_UID
+            value: "0"
+          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+            value: "false"
+          # Option to configure elasticsearch plugin with tls
+          # ================================================================
+          - name: FLUENT_ELASTICSEARCH_SSL_VERSION
+            value: "TLSv1_2"
+          # X-Pack Authentication
+          # =====================
+          - name: FLUENT_ELASTICSEARCH_USER
+            valueFrom:
+              secretKeyRef:
+                name: elastic-credentials
+                key: username
+          - name: FLUENT_ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: elastic-credentials
+                key: password
+        resources:
+          limits:
+            memory: 400Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - name: fluentd-source
+          containerPort: 24220
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config-volume
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: config-volume
+        configMap:
+          name: fluentd-config
+          defaultMode: 0777
+      imagePullSecrets:
+        - name: thm-fluentd-secret-docker

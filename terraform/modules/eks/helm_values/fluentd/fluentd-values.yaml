@@ -1,0 +1,15 @@
+# Terraform이 이 파일을 오버라이드에 사용
+namespace: fluentd
+replicas: 1
+profiles:
+  active: prd
+elasticsearch:
+  url: "https://search.example.es.amazonaws.com"
+  host: "search.example.es.amazonaws.com"
+  port: 443
+  username: "youruser"
+  password: "yourpassword"
+imagePullSecret: <your .dockerconfigjson base64 string>
+nodeSelector:
+  key: node-group
+  value: mgmt
